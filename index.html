@@ -102,26 +102,44 @@
       }
 
       try {
-        const response = await fetch(`https://mahir.free.nf/userinfo.php?username=${encodeURIComponent(username)}`);
-        const data = await response.text();
+        const response = await fetch(`https://mahir.free.nf/index.php?username=${encodeURIComponent(username)}&format=json`);
+        const json = await response.json();
 
-        const lines = data.split('\n');
-        const profilePicLine = lines.find(l => l.includes('Profile Picture URL:'));
-        const profilePicUrl = profilePicLine ? profilePicLine.split('Profile Picture URL:')[1].trim() : '';
+        if (json.error) {
+          throw new Error(json.error);
+        }
 
-        infoText.textContent = data.trim();
+        let formatted = `✘《 User Information ↯ 》\n`;
+        formatted += `↯ Full Name: ${json["Full Name"] || "N/A"}\n`;
+        formatted += `↯ User ID: ${json["User ID"] || "N/A"}\n`;
+        formatted += `↯ Username: ${json["Username"] || "N/A"}\n`;
+        formatted += `↯ Chat Id: ${json["Chat Id"] || "N/A"}\n\n`;
+        formatted += `↯ Premium User: ${json["Premium User"] || "N/A"}\n`;
+        formatted += `↯ Verified: ${json["Verified"] || "N/A"}\n\n`;
+        formatted += `↯ Scam: ${json["Scam"] || "N/A"}\n`;
+        formatted += `↯ Fake: ${json["Fake"] || "N/A"}\n`;
+        formatted += `↯ Flags: ${json["Flags"] || "N/A"}\n`;
+        formatted += `↯ Data Center: ${json["Data Center"] || "N/A"}\n\n`;
+        formatted += `↯ Status: ${json["Status"] || "N/A"}\n`;
+        formatted += `↯ Account Created On: ${json["Account Created On"] || "N/A"}\n`;
+        formatted += `↯ Account Age: ${json["Account Age"] || "N/A"}\n\n`;
+        formatted += `↯ API Owner: ${json["API Owner"] || "N/A"}`;
+
+        infoText.textContent = formatted;
         outputCard.style.display = 'block';
 
-        if (profilePicUrl) {
-          profilePic.src = profilePicUrl;
+        const picUrl = json["Profile Picture URL"]?.replace(/\\\//g, '/');
+        if (picUrl) {
+          profilePic.src = picUrl;
           profilePic.style.display = 'block';
-          downloadBtn.href = profilePicUrl;
+          downloadBtn.href = picUrl;
           downloadBtn.style.display = 'inline-block';
         } else {
           profilePic.style.display = 'none';
           downloadBtn.style.display = 'none';
         }
-      } catch (error) {
+
+      } catch (err) {
         infoText.textContent = '✘ Failed to load data.';
         outputCard.style.display = 'block';
         profilePic.style.display = 'none';
