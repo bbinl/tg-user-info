@@ -95,7 +95,7 @@
       infoText.textContent = 'Loading...';
 
       try {
-        const response = await fetch(`https://myapi.infinityfreeapp.com/userinfo.php?username=${encodeURIComponent(username)}`);
+        const response = await fetch(`https://mahir.free.nf/userinfo.php?username=${encodeURIComponent(username)}`);
         const data = await response.text();
 
         const lines = data.split('\n');
